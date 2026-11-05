@@ -4,7 +4,6 @@ import com.traveldesk.backend.dto.auth.AuthResponse;
 import com.traveldesk.backend.dto.auth.LoginRequest;
 import com.traveldesk.backend.dto.auth.RegisterRequest;
 import com.traveldesk.backend.dto.auth.UserResponse;
-import com.traveldesk.backend.entity.User;
 import com.traveldesk.backend.service.auth.LoginService;
 import com.traveldesk.backend.service.auth.RegistrationService;
 
@@ -37,16 +36,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest request) {
-
-        User user = loginService.authenticate(request);
-
-        AuthResponse response = new AuthResponse(
-                "Login successful",
-                user.getEmail(),
-                user.getRole().getName().name(),
-                null
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(loginService.login(request));
     }
 }
