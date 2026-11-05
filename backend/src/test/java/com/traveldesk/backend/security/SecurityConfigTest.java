@@ -2,6 +2,7 @@ package com.traveldesk.backend.security;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ class SecurityConfigTest {
     void shouldRejectUnauthenticatedCurrentUserRequests()
             throws Exception {
         mockMvc.perform(get("/api/users/me"))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(put("/api/users/me"))
                 .andExpect(status().isUnauthorized());
     }
 
