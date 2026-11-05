@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+import com.traveldesk.backend.enums.RoleName;
+
 @Entity
 @Table(name = "roles")
 @Getter
@@ -18,8 +20,9 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String name;
+   @Enumerated(EnumType.STRING)
+@Column(nullable = false, unique = true, length = 50)
+private RoleName name;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
