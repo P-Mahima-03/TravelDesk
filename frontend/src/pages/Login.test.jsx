@@ -147,6 +147,38 @@ describe("Login", () => {
     expect(window.localStorage.getItem("token")).toBeNull();
   });
 
+  it("shows backend field errors returned by the login API", async () => {
+    api.post.mockRejectedValue({
+      response: {
+        status: 400,
+        data: {
+          message: "Validation failed",
+          errors: ["Email is required", "Password is required"],
+        },
+      },
+    });
+    renderLogin();
+    fillLoginForm();
+
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Email is required Password is required",
+    );
+  });
+
+  it("shows a clear message when the login API cannot be reached", async () => {
+    api.post.mockRejectedValue(new Error("Network Error"));
+    renderLogin();
+    fillLoginForm();
+
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Unable to reach the server",
+    );
+  });
+
   it("disables the form while the request is pending", async () => {
     let resolveRequest;
     api.post.mockReturnValue(

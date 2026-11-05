@@ -1,5 +1,17 @@
 export function getAuthErrorMessage(error) {
   const responseData = error?.response?.data;
+  const validationMessages = Array.isArray(responseData?.errors)
+    ? responseData.errors
+        .map((item) =>
+          typeof item === "string" ? item : item?.defaultMessage,
+        )
+        .filter((message) => typeof message === "string" && message.trim())
+    : [];
+
+  if (validationMessages.length > 0) {
+    return validationMessages.join(" ");
+  }
+
   const serverMessage =
     typeof responseData?.message === "string"
       ? responseData.message.trim()
@@ -9,18 +21,6 @@ export function getAuthErrorMessage(error) {
 
   if (serverMessage) {
     return serverMessage;
-  }
-
-  if (Array.isArray(responseData?.errors)) {
-    const messages = responseData.errors
-      .map((item) =>
-        typeof item === "string" ? item : item?.defaultMessage,
-      )
-      .filter((message) => typeof message === "string" && message.trim());
-
-    if (messages.length > 0) {
-      return messages.join(" ");
-    }
   }
 
   if (!error?.response) {
