@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.traveldesk.backend.enums.BookingStatus;
+
 @Entity
 @Table(name = "bookings")
 @Getter
@@ -40,8 +42,9 @@ public class Booking {
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-    @Column(name = "booking_status", nullable = false, length = 30)
-    private String bookingStatus = "PENDING";
+    @Enumerated(EnumType.STRING)
+@Column(name = "booking_status", nullable = false, length = 30)
+private BookingStatus bookingStatus = BookingStatus.PENDING;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

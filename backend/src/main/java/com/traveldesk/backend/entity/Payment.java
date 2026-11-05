@@ -7,6 +7,11 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
+import com.traveldesk.backend.enums.PaymentMethod;
+import com.traveldesk.backend.enums.PaymentStatus;
 
 @Entity
 @Table(name = "payments")
@@ -29,11 +34,13 @@ public class Payment {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "payment_method", length = 50)
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+@Column(name = "payment_status", nullable = false, length = 30)
+private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
-    @Column(name = "payment_status", nullable = false, length = 30)
-    private String paymentStatus = "PENDING";
+@Enumerated(EnumType.STRING)
+@Column(name = "payment_method", length = 50)
+private PaymentMethod paymentMethod;
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
