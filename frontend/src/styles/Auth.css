@@ -1,0 +1,110 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #f5f7f2;
+  font-family: "DM Sans", sans-serif;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 42px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(30, 50, 30, 0.08);
+}
+
+.auth-brand {
+  display: inline-block;
+  margin-bottom: 28px;
+  color: #315c43;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-card h1 {
+  margin-bottom: 8px;
+  color: #24352a;
+  font-size: 27px;
+}
+
+.auth-subtitle {
+  margin-bottom: 28px;
+  color: #788078;
+  font-size: 14px;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-card label {
+  margin-top: 8px;
+  color: #34463a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #dce3dc;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.auth-card input:focus {
+  border-color: #527b5d;
+}
+
+.auth-button {
+  margin-top: 16px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #315c43;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-button:hover {
+  background: #244832;
+}
+
+.auth-switch {
+  margin-top: 24px;
+  color: #69746c;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-switch a {
+  color: #315c43;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-home {
+  display: block;
+  margin-top: 22px;
+  color: #69746c;
+  text-align: center;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 28px 22px;
+  }
+}
