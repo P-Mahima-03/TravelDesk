@@ -38,7 +38,7 @@ function Login() {
         setFeedback({
           type: "error",
           message:
-            "You were signed in, but this browser could not securely save your session. Please enable browser storage and try again.",
+            "You were signed in, but this browser could not save your session. Please enable browser storage and try again.",
         });
         return;
       }
