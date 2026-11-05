@@ -56,11 +56,45 @@ describe("Login", () => {
     expect(window.localStorage.getItem("token")).toBe("jwt-token");
   });
 
+  it("trims a valid token before storing it", async () => {
+    api.post.mockResolvedValue({
+      data: { message: "Login successful", token: "  jwt-token  " },
+    });
+    renderLogin();
+    fillLoginForm();
+
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Signed in successfully.",
+    );
+    expect(window.localStorage.getItem("token")).toBe("jwt-token");
+  });
+
   it.each([null, "", "   ", 42, {}])(
     "does not store an invalid token (%j)",
     async (token) => {
+      api.post.mockResolvedValue({
+        data: { message: "Login successful", token },
+      });
+      renderLogin();
+      fillLoginForm();
+
+      fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "did not return a valid authentication token",
+      );
+      expect(window.localStorage.getItem("token")).toBeNull();
+    },
+  );
+
+  it("reports when browser storage is unavailable", async () => {
     api.post.mockResolvedValue({
-      data: { message: "Login successful", token },
+      data: { message: "Login successful", token: "jwt-token" },
+    });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("Storage is unavailable");
     });
     renderLogin();
     fillLoginForm();
@@ -68,11 +102,9 @@ describe("Login", () => {
     fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "did not return a valid authentication token",
+      "could not save your session",
     );
-    expect(window.localStorage.getItem("token")).toBeNull();
-    },
-  );
+  });
 
   it("shows a server error and restores the submit button", async () => {
     api.post.mockRejectedValue({

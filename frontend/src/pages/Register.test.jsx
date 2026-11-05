@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import api from "../services/api";
@@ -79,5 +85,42 @@ describe("Register", () => {
     expect(
       screen.getByRole("button", { name: "Create Account" }),
     ).toBeEnabled();
+  });
+
+  it("disables the form while registration is pending", async () => {
+    let resolveRequest;
+    api.post.mockReturnValue(
+      new Promise((resolve) => {
+        resolveRequest = resolve;
+      }),
+    );
+    renderRegister();
+    fillRegistrationForm();
+
+    fireEvent.click(screen.getByRole("button", { name: "Create Account" }));
+
+    expect(
+      screen.getByRole("button", { name: "Creating Account..." }),
+    ).toBeDisabled();
+    resolveRequest({
+      data: { id: 1, email: "alex@example.com", role: "CUSTOMER" },
+    });
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Your account has been created. You can now sign in.",
+      );
+    });
+  });
+
+  it("shows a useful message when the server cannot be reached", async () => {
+    api.post.mockRejectedValue(new Error("Network Error"));
+    renderRegister();
+    fillRegistrationForm();
+
+    fireEvent.click(screen.getByRole("button", { name: "Create Account" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Unable to reach the server",
+    );
   });
 });
