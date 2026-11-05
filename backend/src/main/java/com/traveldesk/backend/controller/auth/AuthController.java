@@ -1,0 +1,31 @@
+package com.traveldesk.backend.controller.auth;
+
+import com.traveldesk.backend.dto.auth.RegisterRequest;
+import com.traveldesk.backend.dto.auth.UserResponse;
+import com.traveldesk.backend.service.auth.RegistrationService;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    private final RegistrationService registrationService;
+
+    public AuthController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(
+            @Valid @RequestBody RegisterRequest request) {
+
+        UserResponse response = registrationService.register(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+}
