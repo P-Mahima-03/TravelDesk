@@ -81,6 +81,25 @@
   background: #244832;
 }
 
+.auth-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.auth-feedback {
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.auth-feedback--error {
+  color: #a12622;
+}
+
+.auth-feedback--success {
+  color: #315c43;
+}
+
 .auth-switch {
   margin-top: 24px;
   color: #69746c;
