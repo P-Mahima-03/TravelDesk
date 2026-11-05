@@ -1,8 +1,18 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import api from "../services/api";
+import ProtectedRoute from "../components/ProtectedRoute";
 import Login from "./Login";
+
+const validToken =
+  "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjo0MTAyNDQ0ODAwfQ.c2lnbmF0dXJl";
 
 vi.mock("../services/api", () => ({
   default: { post: vi.fn() },
@@ -10,8 +20,11 @@ vi.mock("../services/api", () => ({
 
 function renderLogin() {
   return render(
-    <MemoryRouter>
-      <Login />
+    <MemoryRouter initialEntries={["/login"]}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<p>Home page</p>} />
+      </Routes>
     </MemoryRouter>,
   );
 }
@@ -25,6 +38,12 @@ function fillLoginForm() {
   });
 }
 
+function TripLocation() {
+  const location = useLocation();
+
+  return <p>Upcoming trips{location.search}{location.hash}</p>;
+}
+
 describe("Login", () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -35,9 +54,9 @@ describe("Login", () => {
     vi.resetAllMocks();
   });
 
-  it("submits credentials, stores a returned token, and shows success", async () => {
+  it("submits credentials, stores a returned token, and navigates home", async () => {
     api.post.mockResolvedValue({
-      data: { message: "Login successful", token: "jwt-token" },
+      data: { message: "Login successful", token: validToken },
     });
     renderLogin();
     fillLoginForm();
@@ -50,28 +69,31 @@ describe("Login", () => {
         password: "correct-horse-battery",
       });
     });
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Signed in successfully.",
+    expect(await screen.findByText("Home page")).toBeInTheDocument();
+    expect(window.localStorage.getItem("token")).toBe(
+      validToken,
     );
-    expect(window.localStorage.getItem("token")).toBe("jwt-token");
   });
 
   it("trims a valid token before storing it", async () => {
     api.post.mockResolvedValue({
-      data: { message: "Login successful", token: "  jwt-token  " },
+      data: {
+        message: "Login successful",
+        token: `  ${validToken}  `,
+      },
     });
     renderLogin();
     fillLoginForm();
 
     fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Signed in successfully.",
+    expect(await screen.findByText("Home page")).toBeInTheDocument();
+    expect(window.localStorage.getItem("token")).toBe(
+      validToken,
     );
-    expect(window.localStorage.getItem("token")).toBe("jwt-token");
   });
 
-  it.each([null, "", "   ", 42, {}])(
+  it.each([null, "", "   ", "not-a-jwt", 42, {}])(
     "does not store an invalid token (%j)",
     async (token) => {
       api.post.mockResolvedValue({
@@ -91,7 +113,10 @@ describe("Login", () => {
 
   it("reports when browser storage is unavailable", async () => {
     api.post.mockResolvedValue({
-      data: { message: "Login successful", token: "jwt-token" },
+      data: {
+        message: "Login successful",
+        token: validToken,
+      },
     });
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new Error("Storage is unavailable");
@@ -137,7 +162,36 @@ describe("Login", () => {
     expect(
       screen.getByRole("button", { name: "Signing In..." }),
     ).toBeDisabled();
-    resolveRequest({ data: { token: "jwt-token" } });
-    await screen.findByRole("status");
+    resolveRequest({ data: { token: validToken } });
+    await screen.findByText("Home page");
+  });
+
+  it("returns to the originally requested protected route after login", async () => {
+    api.post.mockResolvedValue({
+      data: { message: "Login successful", token: validToken },
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/trips?tab=upcoming#list"]}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/trips"
+            element={
+              <ProtectedRoute>
+                <TripLocation />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    fillLoginForm();
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(
+      await screen.findByText("Upcoming trips?tab=upcoming#list"),
+    ).toBeInTheDocument();
   });
 });
