@@ -1,4 +1,6 @@
 
+import { useNavigate } from "react-router-dom";
+import { isAuthenticated, logout } from "../services/auth";
 import "../styles/Home.css";
 
 const destinations = [
@@ -50,6 +52,9 @@ const packages = [
 ];
 
 function Home() {
+  const navigate = useNavigate();
+  const authenticated = isAuthenticated();
+
   const handleSearch = (event) => {
     event.preventDefault();
     alert("Destination search will be connected to the TravelDesk API soon!");
@@ -72,8 +77,20 @@ function Home() {
         </nav>
 
         <div className="nav-actions">
-          <a href="/login" className="login-link">Log in</a>
-          <a href="/register" className="nav-button">Sign up</a>
+          {authenticated ? (
+            <button
+              type="button"
+              className="nav-button logout-button"
+              onClick={() => logout(navigate)}
+            >
+              Log out
+            </button>
+          ) : (
+            <>
+              <a href="/login" className="login-link">Log in</a>
+              <a href="/register" className="nav-button">Sign up</a>
+            </>
+          )}
         </div>
       </header>
 

@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { isValidToken, setToken } from "../services/auth";
 import { getAuthErrorMessage } from "../services/authError";
 import "../styles/Auth.css";
 
 function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -23,7 +26,7 @@ function Login() {
       const response = await api.post("/auth/login", credentials);
       const token = response?.data?.token;
 
-      if (typeof token !== "string" || token.trim().length === 0) {
+      if (!isValidToken(token)) {
         setFeedback({
           type: "error",
           message:
@@ -32,9 +35,7 @@ function Login() {
         return;
       }
 
-      try {
-        window.localStorage.setItem("token", token.trim());
-      } catch {
+      if (!setToken(token)) {
         setFeedback({
           type: "error",
           message:
@@ -44,6 +45,18 @@ function Login() {
       }
 
       setFeedback({ type: "success", message: "Signed in successfully." });
+      const requestedLocation = location.state?.from;
+      const destination =
+        typeof requestedLocation?.pathname === "string"
+          && requestedLocation.pathname.startsWith("/")
+          && !requestedLocation.pathname.startsWith("//")
+          ? {
+              pathname: requestedLocation.pathname,
+              search: requestedLocation.search ?? "",
+              hash: requestedLocation.hash ?? "",
+            }
+          : "/";
+      navigate(destination, { replace: true });
     } catch (error) {
       setFeedback({ type: "error", message: getAuthErrorMessage(error) });
     } finally {
