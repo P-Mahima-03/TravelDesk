@@ -74,6 +74,8 @@ describe("Packages", () => {
     expect(screen.getByText("$250.00")).toBeInTheDocument();
     expect(screen.getByText("A guided tour of historic temples."))
       .toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View details" }))
+      .toHaveAttribute("href", "/packages/11");
   });
 
   it("shows an empty state when no packages match", async () => {

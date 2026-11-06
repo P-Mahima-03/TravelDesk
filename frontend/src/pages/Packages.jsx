@@ -50,6 +50,12 @@ function PackageCard({ travelPackage }) {
           </p>
         )}
         <p className="listing-package-price">{formatPrice(travelPackage.basePrice)}</p>
+        <Link
+          className="package-details-link"
+          to={`/packages/${travelPackage.id}`}
+        >
+          View details
+        </Link>
       </div>
     </article>
   );
