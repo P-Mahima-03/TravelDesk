@@ -19,3 +19,22 @@ export async function getPackage(id) {
 
   return response.data;
 }
+
+export async function createPackage(packageData) {
+  const response = await api.post("/packages", packageData);
+  return response.data;
+}
+
+export async function updatePackage(id, packageData) {
+  const response = await api.put(`/packages/${encodeURIComponent(id)}`, packageData);
+  return response.data;
+}
+
+export async function deletePackage(id) {
+  await api.delete(`/packages/${encodeURIComponent(id)}`);
+}
+
+export async function getCurrentUser() {
+  const response = await api.get("/users/me");
+  return response.data;
+}

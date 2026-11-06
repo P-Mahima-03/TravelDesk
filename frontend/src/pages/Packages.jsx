@@ -245,9 +245,14 @@ function Packages() {
         <Link to="/" className="destinations-brand">
           TravelDesk
         </Link>
-        <Link to="/" className="destinations-home-link">
-          Back to home
-        </Link>
+        <nav className="package-page-nav">
+          <Link to="/packages/manage" className="destinations-home-link">
+            Manage packages
+          </Link>
+          <Link to="/" className="destinations-home-link">
+            Back to home
+          </Link>
+        </nav>
       </header>
 
       <section className="destinations-intro">
