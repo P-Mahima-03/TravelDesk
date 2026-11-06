@@ -84,6 +84,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/packages").hasAnyRole("ADMIN", "TRAVEL_AGENT")
                 .requestMatchers(HttpMethod.PUT, "/api/packages/**").hasAnyRole("ADMIN", "TRAVEL_AGENT")
                 .requestMatchers(HttpMethod.DELETE, "/api/packages/**").hasAnyRole("ADMIN", "TRAVEL_AGENT")
+                .requestMatchers(HttpMethod.POST, "/api/bookings").hasRole("CUSTOMER")
+                .requestMatchers(HttpMethod.GET, "/api/bookings", "/api/bookings/**")
+                    .hasAnyRole("CUSTOMER", "ADMIN", "TRAVEL_AGENT")
+                .requestMatchers(HttpMethod.POST, "/api/bookings/*/cancel")
+                    .hasRole("CUSTOMER")
+                .requestMatchers(HttpMethod.PATCH, "/api/bookings/*/status")
+                    .hasAnyRole("ADMIN", "TRAVEL_AGENT")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exceptions -> exceptions
