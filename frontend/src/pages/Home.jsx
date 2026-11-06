@@ -1,31 +1,9 @@
 
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { isAuthenticated, logout } from "../services/auth";
+import { getDestinations } from "../services/destinationService";
 import "../styles/Home.css";
-
-const destinations = [
-  {
-    name: "Bali",
-    country: "Indonesia",
-    price: "$599",
-    image:
-      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=700",
-  },
-  {
-    name: "Santorini",
-    country: "Greece",
-    price: "$899",
-    image:
-      "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=700",
-  },
-  {
-    name: "Swiss Alps",
-    country: "Switzerland",
-    price: "$1,099",
-    image:
-      "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=700",
-  },
-];
 
 const packages = [
   {
@@ -54,10 +32,40 @@ const packages = [
 function Home() {
   const navigate = useNavigate();
   const authenticated = isAuthenticated();
+  const [destinations, setDestinations] = useState([]);
+  const [destinationsLoading, setDestinationsLoading] = useState(true);
+  const [destinationsError, setDestinationsError] = useState("");
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    getDestinations()
+      .then((results) => {
+        if (isCurrent) {
+          setDestinations(results.slice(0, 3));
+        }
+      })
+      .catch(() => {
+        if (isCurrent) {
+          setDestinationsError("Unable to load popular destinations.");
+        }
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setDestinationsLoading(false);
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
 
   const handleSearch = (event) => {
     event.preventDefault();
-    alert("Destination search will be connected to the TravelDesk API soon!");
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get("destination").trim();
+    navigate(`/destinations?${new URLSearchParams({ name }).toString()}`);
   };
 
   return (
@@ -70,7 +78,7 @@ function Home() {
 
         <nav className="nav-links">
           <a href="#home">Home</a>
-          <a href="#destinations">Destinations</a>
+          <Link to="/destinations">Destinations</Link>
           <a href="#packages">Packages</a>
           <a href="#services">Services</a>
           <a href="#about">About</a>
@@ -113,6 +121,7 @@ function Home() {
                 <label htmlFor="destination">Destination</label>
                 <input
                   id="destination"
+                  name="destination"
                   type="text"
                   placeholder="Where do you want to go?"
                   required
@@ -153,17 +162,33 @@ function Home() {
               <h2>Popular destinations</h2>
               <p>Places that deserve a place on your bucket list.</p>
             </div>
-            <a href="#packages" className="text-link">Explore all trips ↗</a>
+            <Link to="/destinations" className="text-link">View all destinations ↗</Link>
           </div>
 
           <div className="destination-grid">
-            {destinations.map((destination) => (
-              <article className="destination-card" key={destination.name}>
-                <img src={destination.image} alt={destination.name} />
+            {destinationsLoading ? (
+              <p role="status">Loading destinations...</p>
+            ) : destinationsError ? (
+              <p role="alert">{destinationsError}</p>
+            ) : destinations.length === 0 ? (
+              <p>No destinations are available yet.</p>
+            ) : destinations.map((destination) => (
+              <article className="destination-card" key={destination.id}>
+                {destination.imageUrl ? (
+                  <img src={destination.imageUrl} alt={destination.name} />
+                ) : (
+                  <div
+                    className="destination-image-placeholder"
+                    role="img"
+                    aria-label="No destination image available"
+                  >
+                    <span>TravelDesk</span>
+                  </div>
+                )}
                 <div className="destination-overlay">
-                  <span>{destination.country}</span>
+                  <span>{[destination.city, destination.country].filter(Boolean).join(", ")}</span>
                   <h3>{destination.name}</h3>
-                  <p>From {destination.price}</p>
+                  {destination.description && <p>{destination.description}</p>}
                 </div>
               </article>
             ))}
