@@ -88,6 +88,8 @@ describe("Home authentication navigation", () => {
       .toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Destinations" }))
       .toHaveAttribute("href", "/destinations");
+    expect(screen.getByRole("link", { name: "Packages" }))
+      .toHaveAttribute("href", "/packages");
     expect(screen.getByRole("link", { name: /view all destinations/i }))
       .toHaveAttribute("href", "/destinations");
     expect(getDestinations).toHaveBeenCalledWith();
