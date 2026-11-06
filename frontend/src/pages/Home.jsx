@@ -79,7 +79,7 @@ function Home() {
         <nav className="nav-links">
           <a href="#home">Home</a>
           <Link to="/destinations">Destinations</Link>
-          <a href="#packages">Packages</a>
+          <Link to="/packages">Packages</Link>
           <a href="#services">Services</a>
           <a href="#about">About</a>
         </nav>
