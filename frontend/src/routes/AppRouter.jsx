@@ -6,6 +6,7 @@ import Register from "../pages/Register";
 import Destinations from "../pages/Destinations";
 import Packages from "../pages/Packages";
 import PackageDetails from "../pages/PackageDetails";
+import PackageManagement from "../pages/PackageManagement";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/packages/:id",
     element: <PackageDetails />,
+  },
+  {
+    path: "/packages/manage",
+    element: <PackageManagement />,
   },
 ]);
 
