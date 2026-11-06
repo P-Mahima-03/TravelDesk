@@ -72,6 +72,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/destinations", "/api/destinations/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/packages", "/api/packages/**").permitAll()
                 .requestMatchers(
                     "/api/auth/login",
                     "/api/auth/register",
@@ -80,6 +81,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/destinations").hasAnyRole("ADMIN", "TRAVEL_AGENT")
                 .requestMatchers(HttpMethod.PUT, "/api/destinations/**").hasAnyRole("ADMIN", "TRAVEL_AGENT")
                 .requestMatchers(HttpMethod.DELETE, "/api/destinations/**").hasAnyRole("ADMIN", "TRAVEL_AGENT")
+                .requestMatchers(HttpMethod.POST, "/api/packages").hasAnyRole("ADMIN", "TRAVEL_AGENT")
+                .requestMatchers(HttpMethod.PUT, "/api/packages/**").hasAnyRole("ADMIN", "TRAVEL_AGENT")
+                .requestMatchers(HttpMethod.DELETE, "/api/packages/**").hasAnyRole("ADMIN", "TRAVEL_AGENT")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exceptions -> exceptions
