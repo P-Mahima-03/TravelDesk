@@ -9,6 +9,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class AuthExceptionHandler {
@@ -29,11 +30,18 @@ public class AuthExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-public ResponseEntity<Map<String, String>> handleBadCredentials(
-        BadCredentialsException exception) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(Map.of("message", "Invalid email or password"));
-}
+    public ResponseEntity<Map<String, String>> handleBadCredentials(
+            BadCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Invalid email or password"));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatusException(
+            ResponseStatusException exception) {
+        return ResponseEntity.status(exception.getStatusCode())
+                .body(Map.of("message", exception.getReason()));
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateEmail(
